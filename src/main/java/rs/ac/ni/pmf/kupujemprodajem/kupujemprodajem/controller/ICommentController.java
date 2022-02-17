@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.AdDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.CommentDTO;
 
-
+@RequestMapping("/v1")
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Found the comment"),
         @ApiResponse(responseCode = "201", description = "Comment has been created"),

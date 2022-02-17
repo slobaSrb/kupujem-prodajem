@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.CommentDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.RatingDTO;
 
-
+@RequestMapping("/v1")
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Found the resource"),
         @ApiResponse(responseCode = "201", description = "Resource has been created"),

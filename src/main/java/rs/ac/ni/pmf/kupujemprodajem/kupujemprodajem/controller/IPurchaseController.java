@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.CommentDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.PurchaseDTO;
 
+@RequestMapping("/v1")
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Found the purchas"),
         @ApiResponse(responseCode = "201", description = "Purchase has been created"),

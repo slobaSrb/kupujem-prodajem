@@ -15,6 +15,7 @@ import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.PurchaseDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.RatingDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.UserDTO;
 
+@RequestMapping("/v1")
 @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Found the resource"),
         @ApiResponse(responseCode = "201", description = "Resource has been created"),
