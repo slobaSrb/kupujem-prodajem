@@ -11,22 +11,12 @@ import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.*;
 @ResponseBody
 public class ErrorController {
 
-    private final Class<UserNotFoundException> userNotFoundExceptionClass = UserNotFoundException.class;
 
     @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ApiError handle(org.springframework.web.HttpRequestMethodNotSupportedException e) {
         return ApiError.builder()
-                .code(ApiError.ErrorCode.NOT_AUTHORIZED)
-                .message(e.getMessage())
-                .build();
-    }
-
-    @ExceptionHandler({AdNotFoundException.class, UserNotFoundException.class, CommentNotFoundException.class, RatingNotFoundException.class, PurchaseNotFoundException.class})
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handleNotFoundException(final RuntimeException e) {
-        return ApiError.builder()
-                .code(ApiError.ErrorCode.NOT_FOUND)
+                .code(ApiError.ErrorCode.UNAUTHORIZED)
                 .message(e.getMessage())
                 .build();
     }
@@ -42,11 +32,20 @@ public class ErrorController {
     }
 
     @ExceptionHandler(DuplicateResourceException.class)
-    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    @ResponseStatus(code = HttpStatus.CONFLICT)
     public ApiError handleDuplicateResourceException(final DuplicateResourceException e) {
         return ApiError.builder()
                 .code(ApiError.ErrorCode.DUPLICATE)
                 .resourceType(e.getResourceType())
+                .message(e.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(code = HttpStatus.BAD_REQUEST)
+    public ApiError handleDuplicateResourceException(final BadRequestException e) {
+        return ApiError.builder()
+                .code(ApiError.ErrorCode.BAD_REQUEST)
                 .message(e.getMessage())
                 .build();
     }

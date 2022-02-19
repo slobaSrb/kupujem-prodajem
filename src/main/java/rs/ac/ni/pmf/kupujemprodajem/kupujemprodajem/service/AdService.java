@@ -12,24 +12,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.AdStatus;
-import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.Currency;
-import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.DiscountType;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.controller.impl.AdController;
-import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.AdNotFoundException;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.ApiError;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.BadRequestException;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.DuplicateResourceException;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.ResourceNotFoundException;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.ModelBuilder;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.AdDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.CommentDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.entity.AdEntity;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.entity.CommentEntity;
-import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.entity.UserEntity;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.mapper.AdMapper;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.mapper.CommentMapper;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.repositories.AdRepository;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.repositories.CommentRepository;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,7 +40,7 @@ public class AdService {
     private final AdRepository adRepository;
     private final CommentRepository commentRepository;
 
-    public EntityModel<AdDTO> getAd(@PathVariable final Long id) {
+    public EntityModel<AdDTO> getAd(final Long id) {
         final AdEntity adEntity = findAd(id);
 
         return ModelBuilder.buildAdModel(AdMapper.toDto(adEntity));
@@ -60,7 +57,7 @@ public class AdService {
                 linkTo(methodOn(AdController.class).getAllAds()).withSelfRel());
     }
 
-    public CollectionModel<EntityModel<CommentDTO>> getAllAdComments(@PathVariable final Long id)
+    public CollectionModel<EntityModel<CommentDTO>> getAllAdComments(final Long id)
     {
         List<EntityModel<CommentDTO>> adComments = commentRepository.findAll().stream()
                 .filter((x) -> adComments(x, id))
@@ -82,7 +79,7 @@ public class AdService {
         }
     }
 
-    public ResponseEntity<EntityModel<AdDTO>> createAd(@RequestBody final AdDTO adDto)  {
+    public ResponseEntity<EntityModel<AdDTO>> createAd(final AdDTO adDto)  {
 
         //adExists(adDto);
 
@@ -96,37 +93,37 @@ public class AdService {
                 .body(ModelBuilder.buildAdModel(AdMapper.toDto(savedEntity)));
     }
 
-    public EntityModel<AdDTO> updateAd(@PathVariable Long id, @RequestBody AdDTO adDto) {
+    public EntityModel<AdDTO> updateAd(final Long id, final AdDTO adDto) {
         final AdEntity entity = findAd(id);
 
-        if(adDto.getQuantityAvailable() != null) entity.setQuantityAvailable(adDto.getQuantityAvailable());
+        if(adDto.getQuantityAvailable() != null) { entity.setQuantityAvailable(adDto.getQuantityAvailable()); } else { throw new BadRequestException("Quantity not specified."); }
         AdEntity savedEntity = adRepository.save(entity);
         return ModelBuilder.buildAdModel(AdMapper.toDto(savedEntity));
     }
 
-    public ResponseEntity<?> updateAdPriceCurrency(@PathVariable Long id, @RequestBody AdDTO adDto) {
+    public ResponseEntity<?> updateAdPriceCurrency(final Long id, final AdDTO adDto) {
         final AdEntity entity = findAd(id);
 
-        if(adDto.getPrice() != null) entity.setPrice(adDto.getPrice());
-        if(adDto.getCurrency() != null) entity.setCurrency(adDto.getCurrency());
+        if(adDto.getPrice() != null) { entity.setPrice(adDto.getPrice()); } else { throw new BadRequestException("Price not specified."); }
+        if(adDto.getCurrency() != null) { entity.setCurrency(adDto.getCurrency()); } else { throw new BadRequestException("Currency not specified.");}
         AdEntity savedEntity = adRepository.save(entity);
         return ResponseEntity
                 .accepted()
                 .body(ModelBuilder.buildAdModel(AdMapper.toDto(savedEntity)));
     }
 
-    public ResponseEntity<?> updateAdTitleDescription(@PathVariable Long id, @RequestBody AdDTO adDto) {
+    public ResponseEntity<?> updateAdTitleDescription(final Long id, final AdDTO adDto) {
         final AdEntity entity = findAd(id);
 
-        if(adDto.getTitle() != null) entity.setTitle(adDto.getTitle());
-        if(adDto.getDescription() != null) entity.setDescription(adDto.getDescription());
+        if(adDto.getTitle() != null || adDto.getTitle().length() > 3) { entity.setTitle(adDto.getTitle()); } else { throw new BadRequestException("Title is not valid."); }
+        if(adDto.getDescription() != null || adDto.getDescription().length() > 5) { entity.setDescription(adDto.getDescription()); } else { throw new BadRequestException("Description is not valid"); }
         AdEntity savedEntity = adRepository.save(entity);
         return ResponseEntity
                 .accepted()
                 .body(ModelBuilder.buildAdModel(AdMapper.toDto(savedEntity)));
     }
 
-    public ResponseEntity<?> deleteAd(@PathVariable Long id) {
+    public ResponseEntity<?> deleteAd(final Long id) {
 
         final AdEntity entity = findAd(id);
 
@@ -135,7 +132,7 @@ public class AdService {
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<?> changeAdStatus(@PathVariable final Long id, @RequestBody AdDTO adDTO)
+    public ResponseEntity<?> changeAdStatus(final Long id, final AdDTO adDTO)
     {
         AdEntity adEntity = findAd(id);
 
@@ -161,7 +158,7 @@ public class AdService {
         }
     }
 
-    public ResponseEntity<?> outOfStockAd(@PathVariable final Long id){
+    public ResponseEntity<?> outOfStockAd(final Long id){
         final AdEntity adEntity = findAd(id);
 
         if(adEntity.getStatus() == AdStatus.Available){
@@ -177,7 +174,7 @@ public class AdService {
                 .withDetail("Ad with an id '"+ id + "' can't be put to outOfStock cause it's in status " + adEntity.getStatus()));
     }
 
-    public ResponseEntity<?> removeAd(@PathVariable final Long id){
+    public ResponseEntity<?> removeAd(final Long id){
         final AdEntity adEntity = findAd(id);
 
         if(adEntity.getStatus() == AdStatus.Available){
@@ -197,11 +194,11 @@ public class AdService {
     private AdEntity findAd(final long id)
     {
         return adRepository.findById(id)
-                .orElseThrow(()->new AdNotFoundException(id));
+                .orElseThrow(()->new ResourceNotFoundException(ApiError.ResourceType.AD, "Ad with an id " + id + " not found."));
     }
 
     private void adExists(AdDTO adDTO){
-        if (adDTO.getAdID() == adRepository.findById(adDTO.getAdID()).get().getAdID()){
+        if (adDTO.getAdID().equals(adRepository.findById(adDTO.getAdID()).get().getAdID())){
             throw new DuplicateResourceException(ApiError.ResourceType.AD, "Ad with an id '"+ adDTO.getAdID() + "' already exists");
         }
     }

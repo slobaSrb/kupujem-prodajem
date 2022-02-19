@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.controller.impl.CommentController;
-import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.CommentNotFoundException;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.ApiError;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.BadRequestException;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.ResourceNotFoundException;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.ModelBuilder;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.CommentDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.entity.CommentEntity;
@@ -27,7 +29,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class CommentService {
     private final CommentRepository commentRepository;
 
-    public EntityModel<CommentDTO> getComment(@PathVariable final Long id){
+    public EntityModel<CommentDTO> getComment(final Long id){
         final CommentEntity commentEntity = findComment(id);
 
         return ModelBuilder.buildCommentModel(CommentMapper.toDto(commentEntity));
@@ -44,7 +46,7 @@ public class CommentService {
                 linkTo(methodOn(CommentController.class).getAllComments()).withSelfRel());
     }
 
-    public ResponseEntity<EntityModel<CommentDTO>> createComment(@RequestBody final CommentDTO commentDto){
+    public ResponseEntity<EntityModel<CommentDTO>> createComment(final CommentDTO commentDto){
         final CommentEntity commentEntity = CommentMapper.toEntity(commentDto);
 
         final CommentEntity savedEntity = commentRepository.save(commentEntity);
@@ -54,17 +56,17 @@ public class CommentService {
                 .body(ModelBuilder.buildCommentModel(CommentMapper.toDto(savedEntity)));
     }
 
-    public ResponseEntity<?> updateComment(@PathVariable Long id, @RequestBody CommentDTO commentDTO){
+    public ResponseEntity<?> updateComment(final Long id, final CommentDTO commentDTO){
         final CommentEntity entity = findComment(id);
 
-        if(commentDTO.getComment() != null) entity.setComment(commentDTO.getComment());
+        if(commentDTO.getComment() != null || commentDTO.getComment().length() > 5) { entity.setComment(commentDTO.getComment()); } else { throw new BadRequestException("Comment not valid."); }
         entity.setCommentDate(OffsetDateTime.now());
         commentRepository.save(entity);
         CommentEntity savedEntity = commentRepository.save(entity);
         return ResponseEntity.ok().body(ModelBuilder.buildCommentModel(CommentMapper.toDto(savedEntity)));
     }
 
-    public ResponseEntity<?> deleteComment(@PathVariable Long id) {
+    public ResponseEntity<?> deleteComment(final Long id) {
         final CommentEntity entity = findComment(id);
 
         commentRepository.delete(entity);
@@ -72,8 +74,8 @@ public class CommentService {
         return ResponseEntity.noContent().build();
     }
 
-    private CommentEntity findComment(Long commentID) {
+    private CommentEntity findComment(final Long commentID) {
         return commentRepository.findById(commentID)
-                .orElseThrow(()->new CommentNotFoundException(commentID));
+                .orElseThrow(()->new ResourceNotFoundException(ApiError.ResourceType.COMMENT,"Comment with id " + commentID + "not found."));
     }
 }

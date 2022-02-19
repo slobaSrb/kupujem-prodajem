@@ -1,6 +1,7 @@
 package rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
@@ -8,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.controller.impl.RatingController;
-import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.RatingNotFoundException;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.ApiError;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.BadRequestException;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.ResourceNotFoundException;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.ModelBuilder;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.RatingDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.entity.RatingEntity;
@@ -23,6 +26,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class RatingService {
     private final RatingRepository ratingRepository;
 
@@ -30,9 +34,9 @@ public class RatingService {
         return ModelBuilder.buildRatingModel(RatingMapper.toDto(findRating(id)));
     }
 
-    private RatingEntity findRating(Long ratingID) {
+    private RatingEntity findRating(final Long ratingID) {
         return ratingRepository.findById(ratingID)
-                .orElseThrow(()->new RatingNotFoundException(ratingID));
+                .orElseThrow(()->new ResourceNotFoundException(ApiError.ResourceType.RATING, "Rating with id '" + ratingID + " not found."));
     }
 
     public CollectionModel<EntityModel<RatingDTO>> getAllRatings() {
@@ -48,27 +52,37 @@ public class RatingService {
         );
     }
 
-    public ResponseEntity<EntityModel<RatingDTO>> createRating(@RequestBody final RatingDTO ratingDto){
+    public ResponseEntity<EntityModel<RatingDTO>> createRating( final RatingDTO ratingDTO){
+        log.info(ratingDTO.toString());
 
-        final RatingEntity savedEntity = ratingRepository.save(RatingMapper.toEntity(ratingDto));
+
+        final RatingEntity savedEntity = ratingRepository.save(RatingMapper.toEntity(ratingDTO));
 
         return ResponseEntity
                 .created(linkTo(methodOn(RatingController.class).getRating(savedEntity.getRatingID())).toUri())
                 .body(ModelBuilder.buildRatingModel(RatingMapper.toDto(savedEntity)));
     }
 
-    public EntityModel<RatingDTO> updateRating(@PathVariable Long id, @RequestBody RatingDTO ratingDTO) {
+    public EntityModel<RatingDTO> updateRating(final Long id, final RatingDTO ratingDTO) {
         final RatingEntity entity = findRating(id);
 
-        if(ratingDTO.getRatingComment() != null) entity.setRatingComment(ratingDTO.getRatingComment());
-        if(ratingDTO.getRating() != null) entity.setRating(ratingDTO.getRating());
+        if(ratingDTO.getRatingComment() != null) {
+            entity.setRatingComment(ratingDTO.getRatingComment());
+        }
+        else {
+            throw new BadRequestException("Rating comment not valid.");
+        }
+        if(ratingDTO.getRating() != null) { entity.setRating(ratingDTO.getRating()); }
+        else {
+            throw new BadRequestException("Rating not valid.");
+        }
 
         RatingEntity savedEntity = ratingRepository.save(entity);
         return ModelBuilder.buildRatingModel(RatingMapper.toDto(savedEntity));
     }
 
 
-    public ResponseEntity<?> deleteRating(@PathVariable Long ratingID){
+    public ResponseEntity<?> deleteRating(Long ratingID){
 
         final RatingEntity entity = findRating(ratingID);
 

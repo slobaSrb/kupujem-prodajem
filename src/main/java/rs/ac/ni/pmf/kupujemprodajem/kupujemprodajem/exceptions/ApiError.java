@@ -13,12 +13,13 @@ public class ApiError
 
     public enum ErrorCode
     {
-        NOT_AUTHORIZED,
+        UNAUTHORIZED,
         NOT_FOUND,
         DUPLICATE,
         NOT_CHANGEABLE,
         AUTHENTICATION_FAILED,
-        NOT_REMOVABLE
+        NOT_REMOVABLE,
+        BAD_REQUEST
     }
 
     public enum ResourceType {
@@ -27,7 +28,8 @@ public class ApiError
         COMMENT,
         PURCHASE,
         USER,
-        ROLE
+        ROLE,
+        RATING
     }
 }
 

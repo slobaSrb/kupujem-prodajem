@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.CommentDTO;
@@ -38,10 +39,10 @@ public interface IRatingController {
     @ResponseStatus(HttpStatus.CREATED)
     ResponseEntity<?> createRating(@RequestBody RatingDTO ratingDTO);
 
-    @PutMapping("/ratings/{id}")
+    @PutMapping(value = "/ratings/{id}")
     @Operation(summary = "Updating a rating")
     @ResponseStatus(HttpStatus.OK)
-    EntityModel<RatingDTO> updateRating(@PathVariable Long id, @RequestBody RatingDTO ratingDTO);
+    String updateRating(@PathVariable Long id, @RequestBody String ratingDTO);
 
     @DeleteMapping("/ratings/{id}")
     @Operation(summary = "Deleting a rating")

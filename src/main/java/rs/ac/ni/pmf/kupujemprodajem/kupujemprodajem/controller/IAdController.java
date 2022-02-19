@@ -35,7 +35,7 @@ public interface IAdController {
     @ResponseStatus(HttpStatus.OK)
     EntityModel<AdDTO> getAd(@Parameter(description = "ID of an ad") @PathVariable Long id);
 
-    @GetMapping("/ads/{adID}/comments")
+    @GetMapping("/ads/{id}/comments")
     @Operation(summary = "Retrieve ad's comments")
     @ResponseStatus(HttpStatus.OK)
     CollectionModel<EntityModel<CommentDTO>> getAllAdComments(@PathVariable final Long id);

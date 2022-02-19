@@ -53,7 +53,7 @@ public interface IUserController {
     @PostMapping("/users")
     @Operation(summary = "Create an user")
     @ResponseStatus(HttpStatus.CREATED)
-    ResponseEntity<?> createUser(@RequestBody UserDTO userDTO);
+    String createUser(@RequestBody String userDTO);
 
     @PutMapping("/users/{id}")
     @Operation(summary = "Updating an user")
@@ -65,5 +65,9 @@ public interface IUserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     ResponseEntity<?> deleteUser(@PathVariable Long id);
 
+    @GetMapping("users/{userName}/findUser")
+    @Operation(summary = "Finding user by name")
+    @ResponseStatus(HttpStatus.OK)
+    ResponseEntity<?> findByUserName(@PathVariable String userName);
 
 }

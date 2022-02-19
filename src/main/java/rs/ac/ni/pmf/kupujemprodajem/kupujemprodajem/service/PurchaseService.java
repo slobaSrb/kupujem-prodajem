@@ -10,7 +10,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.controller.impl.PurchaseController;
-import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.PurchaseNotFoundException;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.ApiError;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.BadRequestException;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.ResourceNotFoundException;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.ModelBuilder;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.PurchaseDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.entity.PurchaseEntity;
@@ -29,7 +31,7 @@ public class PurchaseService {
     private final PurchaseRepository purchaseRepository;
 
     @ResponseStatus(HttpStatus.OK)
-    public EntityModel<PurchaseDTO> getPurchase(@PathVariable final Long id){
+    public EntityModel<PurchaseDTO> getPurchase(final Long id){
         final PurchaseEntity purchaseEntity = findPurchase(id);
         return ModelBuilder.buildPurchaseModel(PurchaseMapper.toDto(purchaseEntity));
     }
@@ -47,7 +49,7 @@ public class PurchaseService {
         );
     }
 
-    public ResponseEntity<EntityModel<PurchaseDTO>> createPurchase(@RequestBody final PurchaseDTO purchaseDto){
+    public ResponseEntity<EntityModel<PurchaseDTO>> createPurchase(final PurchaseDTO purchaseDto){
 
         final PurchaseEntity savedEntity = purchaseRepository.save(PurchaseMapper.toEntity(purchaseDto));
 
@@ -56,12 +58,12 @@ public class PurchaseService {
                 .body(ModelBuilder.buildPurchaseModel(PurchaseMapper.toDto(savedEntity)));
     }
 
-    public ResponseEntity<?> updatePurchase(@PathVariable Long id, @RequestBody PurchaseDTO purchaseDto){
+    public ResponseEntity<?> updatePurchase(final Long id,final PurchaseDTO purchaseDto){
         final PurchaseEntity entity = findPurchase(id);
 
-        if(purchaseDto.getAmountPurchesed() != null) entity.setAmountPurchesed(purchaseDto.getAmountPurchesed());
-        if(purchaseDto.getTotalValueOfPurchase() != null) entity.setTotalValueOfPurchase(purchaseDto.getTotalValueOfPurchase());
-        if(purchaseDto.getDatePurchased() != null) entity.setDatePurchased(purchaseDto.getDatePurchased());
+        if(purchaseDto.getAmountPurchesed() != null) { entity.setAmountPurchesed(purchaseDto.getAmountPurchesed()); } else { throw new BadRequestException("Amount purchased not valid."); }
+        if(purchaseDto.getTotalValueOfPurchase() != null) { entity.setTotalValueOfPurchase(purchaseDto.getTotalValueOfPurchase()); } else { throw new BadRequestException("Total value not valid."); }
+        if(purchaseDto.getDatePurchased() != null) { entity.setDatePurchased(purchaseDto.getDatePurchased()); } else { throw new BadRequestException("Date purchased not valid."); }
 
         PurchaseEntity savedEntity = purchaseRepository.save(entity);
         return ResponseEntity
@@ -69,7 +71,7 @@ public class PurchaseService {
                 .body(ModelBuilder.buildPurchaseModel(PurchaseMapper.toDto(savedEntity)));
     }
 
-    public ResponseEntity<?> deletePurchase(@PathVariable Long id){
+    public ResponseEntity<?> deletePurchase(final Long id){
 
         final PurchaseEntity entity = findPurchase(id);
 
@@ -78,8 +80,8 @@ public class PurchaseService {
         return ResponseEntity.noContent().build();
     }
 
-    private PurchaseEntity findPurchase(Long purchaseID) {
+    private PurchaseEntity findPurchase(final Long purchaseID) {
         return purchaseRepository.findById(purchaseID)
-                .orElseThrow(()->new PurchaseNotFoundException(purchaseID));
+                .orElseThrow(()->new ResourceNotFoundException(ApiError.ResourceType.PURCHASE, "Purchase with id '" + purchaseID + "' not found"));
     }
 }

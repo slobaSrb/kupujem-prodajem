@@ -4,13 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.Roles;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.controller.impl.UserController;
-import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.UserNotFoundException;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.ApiError;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.BadRequestException;
+import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.exceptions.ResourceNotFoundException;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.ModelBuilder;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.AdDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.PurchaseDTO;
@@ -46,7 +46,7 @@ public class UserService {
     private final RatingRepository ratingRepository;
     private final PurchaseRepository purchaseRepository;
 
-    public EntityModel<UserDTO> getUser(@PathVariable final Long id) {
+    public EntityModel<UserDTO> getUser(final Long id) {
         final UserEntity userEntity = findUser(id);
 
         return ModelBuilder.buildUserModel(UserMapper.toDto(userEntity));
@@ -65,7 +65,7 @@ public class UserService {
         );
     }
 
-    public CollectionModel<EntityModel<AdDTO>> getAllUserAds(@PathVariable final Long id) {
+    public CollectionModel<EntityModel<AdDTO>> getAllUserAds(final Long id) {
         List<EntityModel<AdDTO>> userAds = adRepository.findAll().stream()
                 .filter((x) -> userAds(x,id))
                 .map(AdMapper::toDto)
@@ -78,15 +78,15 @@ public class UserService {
                 linkTo(methodOn(UserController.class).getAllUserAds(id)).withSelfRel()
         );
     }
-    private boolean userAds(AdEntity adEntity, Long userID){
-        if(adEntity.getSeller().getUserID() == userID){
+    private boolean userAds(final AdEntity adEntity, final Long userID){
+        if(adEntity.getSeller().getUserID().equals(userID)){
             return true;
         } else {
             return false;
         }
     }
 
-    public CollectionModel<EntityModel<RatingDTO>> getAllUserRatings(@PathVariable final Long userID){
+    public CollectionModel<EntityModel<RatingDTO>> getAllUserRatings(final Long userID){
         List<EntityModel<RatingDTO>> userRatings = ratingRepository.findAll().stream()
                 .filter((x) -> userRatings(x,userID))
                 .map(RatingMapper::toDto)
@@ -99,15 +99,15 @@ public class UserService {
         );
     }
 
-    private boolean userRatings(RatingEntity ratingEntity, Long userID){
-        if(ratingEntity.getUser().getUserID() == userID){
+    private boolean userRatings(final RatingEntity ratingEntity, final Long userID){
+        if(ratingEntity.getUser().getUserID().equals(userID)){
             return true;
         } else {
             return false;
         }
     }
 
-    public CollectionModel<EntityModel<PurchaseDTO>> getAllUserPurchases(@PathVariable final Long userID){
+    public CollectionModel<EntityModel<PurchaseDTO>> getAllUserPurchases(final Long userID){
         List<EntityModel<PurchaseDTO>> userPurchases = purchaseRepository.findAll().stream()
                 .filter((x) -> userPurchases(x, userID))
                 .map(PurchaseMapper::toDto)
@@ -120,7 +120,7 @@ public class UserService {
         );
     }
 
-    private boolean userPurchases(PurchaseEntity purchaseEntity, Long userID){
+    private boolean userPurchases(final PurchaseEntity purchaseEntity, final Long userID){
         if(purchaseEntity.getBuyer().getUserID() == userID){
             return true;
         } else {
@@ -128,7 +128,7 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<EntityModel<UserDTO>> createUser(@RequestBody UserDTO userDto) {
+    public ResponseEntity<EntityModel<UserDTO>> createUser(final UserDTO userDto) {
         final UserEntity userEntity = UserMapper.toEntity(userDto);
 
         final UserEntity savedEntity = userRepository.save(userEntity);
@@ -138,13 +138,20 @@ public class UserService {
                 .body(ModelBuilder.buildUserModel(UserMapper.toDto(savedEntity)));
     }
 
-    public ResponseEntity<?> updateUser(@PathVariable final Long userID, @RequestBody UserDTO userDto) {
+    public ResponseEntity<?> updateUser(final Long userID, final UserDTO userDTO) {
+
+        boolean changedForm = false;
+
         final UserEntity entity = findUser(userID);
 
-        if(userDto.getUserName() != null && notInUserNames(userDto.getUserName())) entity.setUserName(userDto.getUserName());
-        if(userDto.getFullName() != null) entity.setFullName(userDto.getFullName());
-        if(userDto.getEmail() != null) entity.setEmail(userDto.getEmail());
-        if(userDto.getRole() != null) entity.setRole(userDto.getRole());
+        if(userDTO.getUserName() != null && notInUserNames(userDTO.getUserName())){ changedForm = true; entity.setUserName(userDTO.getUserName());}
+        if(userDTO.getFullName() != null){  changedForm = true; entity.setFullName(userDTO.getFullName());}
+        if(userDTO.getEmail() != null) { changedForm = true; entity.setEmail(userDTO.getEmail());}
+        if(userDTO.getRole() != null) { changedForm = true; entity.setRole(userDTO.getRole());}
+
+        if(!changedForm){
+            throw new BadRequestException("Data for updating the user not valid.");
+        }
 
         UserEntity savedEntity = userRepository.save(entity);
 
@@ -154,7 +161,7 @@ public class UserService {
 
     }
 
-    public ResponseEntity<?> deleteUser(@PathVariable Long userID) {
+    public ResponseEntity<?> deleteUser(final Long userID) {
         final UserEntity entity = findUser(userID);
 
         userRepository.delete(entity);
@@ -164,10 +171,10 @@ public class UserService {
 
     private UserEntity findUser(final Long userID){
         return userRepository.findById(userID)
-                .orElseThrow(() -> new UserNotFoundException(userID));
+                .orElseThrow(() -> new ResourceNotFoundException(ApiError.ResourceType.USER, "User with id '" + userID + "' not found."));
     }
 
-    private boolean notInUserNames(String userName)
+    private boolean notInUserNames(final String userName)
     {
         for (UserEntity entity : userRepository.findAll()){
             if(entity.getUserName().equals(userName)){
@@ -175,5 +182,20 @@ public class UserService {
             }
         }
         return true;
+    }
+
+    public ResponseEntity<?> findByUserName(final String userName){
+
+        if(userName == null || userName.isEmpty() && userName.length() < 6){
+            throw new BadRequestException("Username not valid.");
+        }
+
+        UserDTO dto = userRepository.findByUserName(userName)
+                .map(UserMapper::toDto)
+                .orElseThrow(()-> new ResourceNotFoundException(ApiError.ResourceType.USER, "User not found"));
+
+        return ResponseEntity
+                .ok()
+                .body(ModelBuilder.buildUserModel(dto));
     }
 }
