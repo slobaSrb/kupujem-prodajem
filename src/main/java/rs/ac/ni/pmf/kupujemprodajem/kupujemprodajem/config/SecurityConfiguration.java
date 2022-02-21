@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.Authentication;
@@ -28,6 +29,24 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
+        final String[] AUTH_WHITELIST = {
+                // -- Swagger UI v2
+                "/v2/api-docs",
+                "/swagger-resources",
+                "/swagger-resources/**",
+                "/configuration/ui",
+                "/configuration/security",
+                "/swagger-ui.html",
+                "/webjars/**",
+                // -- Swagger UI v3 (OpenAPI)
+                "/v3/api-docs/**",
+                "/swagger-ui/**"
+                // other public endpoints of your API may be appended to this array
+        };
+
+
+
         //@formatter:off
         http
                 .csrf().disable()
@@ -35,7 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
                 .antMatchers(HttpMethod.POST, "/v1/users")
                 .permitAll()
                 .antMatchers(HttpMethod.GET, "/v1/users/*/purchases")
-                .hasAnyRole("User", "Admin")
+                .hasAnyRole("User", "Admin").antMatchers(AUTH_WHITELIST).permitAll()
                 .antMatchers(HttpMethod.PUT, "/v1/users/*")
                 .hasAnyRole("User", "Admin")
                 .antMatchers(HttpMethod.DELETE, "/v1/users/*")
@@ -60,11 +79,13 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
                 .hasAnyRole("User", "Admin")
                 .antMatchers(HttpMethod.GET, "/v1/ads/*", "/v1/ads")
                 .permitAll()
+                .antMatchers(HttpMethod.GET, "/swagger-ui.html","/swagger-ui/index.html")
+                .permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
-                //.formLogin()
-                //.and()
+                .formLogin()
+                .and()
                 .httpBasic()
                 .authenticationEntryPoint((request, response, e) -> {
                     log.error("Authentication error: {}", e.getMessage());

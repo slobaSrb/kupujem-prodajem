@@ -102,10 +102,17 @@ public class AdService {
     }
 
     public ResponseEntity<?> updateAdPriceCurrency(final Long id, final AdDTO adDto) {
+        boolean formChanged = false ;
+
         final AdEntity entity = findAd(id);
 
-        if(adDto.getPrice() != null) { entity.setPrice(adDto.getPrice()); } else { throw new BadRequestException("Price not specified."); }
-        if(adDto.getCurrency() != null) { entity.setCurrency(adDto.getCurrency()); } else { throw new BadRequestException("Currency not specified.");}
+        if(adDto.getPrice() != null) { formChanged = true; entity.setPrice(adDto.getPrice()); }
+        if(adDto.getCurrency() != null) { formChanged = true; entity.setCurrency(adDto.getCurrency()); }
+
+        if(!formChanged){
+            throw new BadRequestException("Ad price or currency not valid.");
+        }
+
         AdEntity savedEntity = adRepository.save(entity);
         return ResponseEntity
                 .accepted()
@@ -113,10 +120,17 @@ public class AdService {
     }
 
     public ResponseEntity<?> updateAdTitleDescription(final Long id, final AdDTO adDto) {
+        boolean formChanged = true;
+
         final AdEntity entity = findAd(id);
 
-        if(adDto.getTitle() != null || adDto.getTitle().length() > 3) { entity.setTitle(adDto.getTitle()); } else { throw new BadRequestException("Title is not valid."); }
-        if(adDto.getDescription() != null || adDto.getDescription().length() > 5) { entity.setDescription(adDto.getDescription()); } else { throw new BadRequestException("Description is not valid"); }
+        if(adDto.getTitle() != null || adDto.getTitle().length() > 3) { formChanged = true; entity.setTitle(adDto.getTitle()); }
+        if(adDto.getDescription() != null || adDto.getDescription().length() > 5) { formChanged = true; entity.setDescription(adDto.getDescription()); }
+
+        if(!formChanged){
+            throw new BadRequestException("Ad title or description not valid.");
+        }
+
         AdEntity savedEntity = adRepository.save(entity);
         return ResponseEntity
                 .accepted()
@@ -177,7 +191,7 @@ public class AdService {
     public ResponseEntity<?> removeAd(final Long id){
         final AdEntity adEntity = findAd(id);
 
-        if(adEntity.getStatus() == AdStatus.Available){
+        if(adEntity.getStatus() == AdStatus.Available || adEntity.getStatus() == AdStatus.OutOfStock){
             adEntity.setStatus(AdStatus.Removed);
             adEntity.setQuantityAvailable(0);
             return getResponseEntity(adEntity);

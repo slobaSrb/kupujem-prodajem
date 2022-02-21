@@ -36,22 +36,22 @@ public class AdController implements IAdController {
     }
 
     @Override
-    public ResponseEntity<EntityModel<AdDTO>> createAd(final AdDTO adDto)  {
+    public ResponseEntity<EntityModel<AdDTO>> createAd(@RequestBody final AdDTO adDto)  {
         return _adService.createAd(adDto);
     }
 
     @Override
-    public EntityModel<AdDTO> updateAd(final Long id, final AdDTO adDTO) {
+    public EntityModel<AdDTO> updateAd(final Long id, @RequestBody final AdDTO adDTO) {
         return _adService.updateAd(id, adDTO);
     }
 
     @Override
-    public ResponseEntity<?> updateAdPriceCurrency(final Long id, final AdDTO adDto) {
+    public ResponseEntity<?> updateAdPriceCurrency(final Long id, @RequestBody final AdDTO adDto) {
        return _adService.updateAdPriceCurrency(id, adDto);
     }
 
     @Override
-    public ResponseEntity<?> updateAdTitleDescription(final Long id, final AdDTO adDto) {
+    public ResponseEntity<?> updateAdTitleDescription(final Long id, @RequestBody final AdDTO adDto) {
         return _adService.updateAdTitleDescription(id, adDto);
     }
 
@@ -62,7 +62,7 @@ public class AdController implements IAdController {
     }
 
     @Override
-    public ResponseEntity<?> changeAdStatus(final Long id, final AdDTO adDTO)
+    public ResponseEntity<?> changeAdStatus(final Long id, @RequestBody final AdDTO adDTO)
     {
         return _adService.changeAdStatus(id, adDTO);
     }
