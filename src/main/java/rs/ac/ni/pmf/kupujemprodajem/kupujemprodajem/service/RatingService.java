@@ -53,8 +53,6 @@ public class RatingService {
     }
 
     public ResponseEntity<EntityModel<RatingDTO>> createRating( final RatingDTO ratingDTO){
-        log.info(ratingDTO.toString());
-
 
         final RatingEntity savedEntity = ratingRepository.save(RatingMapper.toEntity(ratingDTO));
 
@@ -64,18 +62,19 @@ public class RatingService {
     }
 
     public EntityModel<RatingDTO> updateRating(final Long id, final RatingDTO ratingDTO) {
+
+        boolean changedForm = false;
+
         final RatingEntity entity = findRating(id);
 
-        if(ratingDTO.getRatingComment() != null) {
-            entity.setRatingComment(ratingDTO.getRatingComment());
-        }
-        else {
-            throw new BadRequestException("Rating comment not valid.");
-        }
-        if(ratingDTO.getRating() != null) { entity.setRating(ratingDTO.getRating()); }
-        else {
+        if(ratingDTO.getRatingComment() != null) { changedForm = true; entity.setRatingComment(ratingDTO.getRatingComment()); }
+        if(ratingDTO.getRating() != null) { changedForm = true; entity.setRating(ratingDTO.getRating()); }
+
+
+        if(!changedForm){
             throw new BadRequestException("Rating not valid.");
         }
+
 
         RatingEntity savedEntity = ratingRepository.save(entity);
         return ModelBuilder.buildRatingModel(RatingMapper.toDto(savedEntity));

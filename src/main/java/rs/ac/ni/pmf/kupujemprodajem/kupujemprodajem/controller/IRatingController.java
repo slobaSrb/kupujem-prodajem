@@ -42,7 +42,7 @@ public interface IRatingController {
     @PutMapping(value = "/ratings/{id}")
     @Operation(summary = "Updating a rating")
     @ResponseStatus(HttpStatus.OK)
-    String updateRating(@PathVariable Long id, @RequestBody String ratingDTO);
+    EntityModel<RatingDTO> updateRating(@PathVariable Long id, @RequestBody RatingDTO ratingDTO);
 
     @DeleteMapping("/ratings/{id}")
     @Operation(summary = "Deleting a rating")

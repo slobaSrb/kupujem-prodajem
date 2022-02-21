@@ -6,7 +6,6 @@ import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.controller.IUserController;
-import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.ModelBuilder;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.*;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.service.UserService;
 
@@ -43,10 +42,8 @@ public class UserController implements IUserController {
         return _userService.getAllUserPurchases(userID);
     }
 
-    @Override
-    public String createUser(@RequestBody final String userDto) {
-        //return _userService.createUser(userDto);
-        return userDto;
+    public ResponseEntity<EntityModel<UserDTO>> createUser(@RequestBody final UserDTO userDto) {
+        return _userService.createUser(userDto);
     }
 
     @Override

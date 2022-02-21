@@ -53,7 +53,7 @@ public interface IUserController {
     @PostMapping("/users")
     @Operation(summary = "Create an user")
     @ResponseStatus(HttpStatus.CREATED)
-    String createUser(@RequestBody String userDTO);
+    ResponseEntity<EntityModel<UserDTO>> createUser(@RequestBody UserDTO userDTO);
 
     @PutMapping("/users/{id}")
     @Operation(summary = "Updating an user")

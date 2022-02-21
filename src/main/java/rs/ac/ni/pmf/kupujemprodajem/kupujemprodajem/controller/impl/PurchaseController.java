@@ -30,12 +30,12 @@ public class PurchaseController implements IPurchaseController {
     }
 
     @Override
-    public ResponseEntity<EntityModel<PurchaseDTO>> createPurchase(final PurchaseDTO purchaseDto){
+    public ResponseEntity<EntityModel<PurchaseDTO>> createPurchase(@RequestBody final PurchaseDTO purchaseDto){
         return _purchaseService.createPurchase(purchaseDto);
     }
 
     @Override
-    public ResponseEntity<?> updatePurchase(final Long id,final PurchaseDTO purchaseDto){
+    public ResponseEntity<?> updatePurchase(final Long id,@RequestBody final PurchaseDTO purchaseDto){
         return _purchaseService.updatePurchase(id,purchaseDto);
     }
 

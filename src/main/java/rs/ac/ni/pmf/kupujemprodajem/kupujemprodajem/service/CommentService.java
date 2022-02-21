@@ -47,6 +47,7 @@ public class CommentService {
     }
 
     public ResponseEntity<EntityModel<CommentDTO>> createComment(final CommentDTO commentDto){
+
         final CommentEntity commentEntity = CommentMapper.toEntity(commentDto);
 
         final CommentEntity savedEntity = commentRepository.save(commentEntity);

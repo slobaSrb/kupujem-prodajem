@@ -38,9 +38,8 @@ public class RatingController implements IRatingController {
     }
 
     @Override
-    public String updateRating(final Long id,@RequestBody final String ratingDTO){
-        //return _ratingService.updateRating(id,ratingDTO);
-        return ratingDTO;
+    public EntityModel<RatingDTO> updateRating(final Long id, @RequestBody final RatingDTO ratingDTO){
+        return _ratingService.updateRating(id,ratingDTO);
     }
 
     @Override

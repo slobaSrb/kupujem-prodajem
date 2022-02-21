@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,6 +46,7 @@ public class UserService {
     private final AdRepository adRepository;
     private final RatingRepository ratingRepository;
     private final PurchaseRepository purchaseRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public EntityModel<UserDTO> getUser(final Long id) {
         final UserEntity userEntity = findUser(id);
@@ -129,7 +131,7 @@ public class UserService {
     }
 
     public ResponseEntity<EntityModel<UserDTO>> createUser(final UserDTO userDto) {
-        final UserEntity userEntity = UserMapper.toEntity(userDto);
+        final UserEntity userEntity = UserMapper.toEntity(userDto, passwordEncoder);
 
         final UserEntity savedEntity = userRepository.save(userEntity);
 

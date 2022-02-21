@@ -28,12 +28,12 @@ public class CommentController implements ICommentController {
     }
 
     @Override
-    public ResponseEntity<EntityModel<CommentDTO>> createComment(final CommentDTO commentDto){
+    public ResponseEntity<EntityModel<CommentDTO>> createComment(@RequestBody final CommentDTO commentDto){
         return _commentService.createComment(commentDto);
     }
 
     @Override
-    public ResponseEntity<?> updateComment(final Long id, final CommentDTO commentDTO){
+    public ResponseEntity<?> updateComment(final Long id, @RequestBody final CommentDTO commentDTO){
         return _commentService.updateComment(id,commentDTO);
     }
 

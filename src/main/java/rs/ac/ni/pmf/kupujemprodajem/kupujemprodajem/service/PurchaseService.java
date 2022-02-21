@@ -59,11 +59,18 @@ public class PurchaseService {
     }
 
     public ResponseEntity<?> updatePurchase(final Long id,final PurchaseDTO purchaseDto){
+
+        boolean changedForm = false;
+
         final PurchaseEntity entity = findPurchase(id);
 
-        if(purchaseDto.getAmountPurchesed() != null) { entity.setAmountPurchesed(purchaseDto.getAmountPurchesed()); } else { throw new BadRequestException("Amount purchased not valid."); }
-        if(purchaseDto.getTotalValueOfPurchase() != null) { entity.setTotalValueOfPurchase(purchaseDto.getTotalValueOfPurchase()); } else { throw new BadRequestException("Total value not valid."); }
-        if(purchaseDto.getDatePurchased() != null) { entity.setDatePurchased(purchaseDto.getDatePurchased()); } else { throw new BadRequestException("Date purchased not valid."); }
+        if(purchaseDto.getAmountPurchesed() != null) { changedForm = true; entity.setAmountPurchesed(purchaseDto.getAmountPurchesed()); }
+        if(purchaseDto.getTotalValueOfPurchase() != null) { changedForm = true; entity.setTotalValueOfPurchase(purchaseDto.getTotalValueOfPurchase()); }
+        if(purchaseDto.getDatePurchased() != null) { changedForm = true; entity.setDatePurchased(purchaseDto.getDatePurchased()); }
+
+        if(!changedForm){
+            throw new BadRequestException("Purchase data not valid.");
+        }
 
         PurchaseEntity savedEntity = purchaseRepository.save(entity);
         return ResponseEntity

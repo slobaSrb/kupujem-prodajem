@@ -22,21 +22,6 @@ public class UserMapper {
 
     public static UserDTO toDto(final UserEntity userEntity) {
 
-
-//        Double avgRating = 0.0;
-//        Integer counter = 0;
-//
-//        for(AdEntity adEntity : adRepository.findAll()){
-//            if(adEntity.getUser().getUserName().equals(userEntity.getUserName())){
-//                for( RatingEntity rating : adEntity.getRatings()){
-//                    avgRating += rating.getRating();
-//                    counter += 1;
-//                }
-//            }
-//        }
-
-//        avgRating /= counter;
-
         return UserDTO.builder()
                 .userID(userEntity.getUserID())
                 .userName(userEntity.getUserName())
@@ -45,28 +30,10 @@ public class UserMapper {
                 .role(userEntity.getRole())
                 .password(userEntity.getPassword())
                 .avgRating(userEntity.getAvgRating())
-                //vrv se ovako ne radi nego mora da se uzmu svi ratinzi za odredjenog usera
-                //.avgRating(userEntity.getAvgRating())
-                //ne bi smelo rolu da mu otkrije po nekom mom ubedjenju
                 .build();
     }
 
-    public static UserEntity toEntity(final UserDTO userDto /*, RolesOfUser userRole*/) {
-//        Double avgRating = 0.0;
-//        Integer counter = 0;
-//
-//        for(AdEntity adEntity : adRepository.findAll()){
-//            if(adEntity.getUser().getUserName().equals(userDto.getUserName())){
-//                for( RatingEntity rating : adEntity.getRatings()){
-//                    avgRating += rating.getRating();
-//                    counter += 1;
-//                }
-//            }
-//        }
-//
-//        avgRating /= counter;
-
-        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    public static UserEntity toEntity(final UserDTO userDto, PasswordEncoder passwordEncoder) {
 
         return UserEntity.builder()
                 .userID(userDto.getUserID())
@@ -74,16 +41,8 @@ public class UserMapper {
                 .fullName(userDto.getFullName())
                 .email(userDto.getEmail())
                 .role(userDto.getRole())
-                //.password(passwordEncoder.encode(userDto.getPassword()))
-                .password(encoder.encode(userDto.getPassword()))
-                //isti komentar odozgo
+                .password(passwordEncoder.encode(userDto.getPassword()))
                 .avgRating(userDto.getAvgRating())
-
-                // kako promeniti password useru
-
-                // rola se ne menja
-                // ostali atributi se isto ne menjaju
-                // pitanje je da l se to dobavi iz baze, videcemo u servisima
                 .build();
     }
 

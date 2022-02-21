@@ -14,4 +14,5 @@ public class RatingDTO {
     private String ratingComment;
     private Long adID;
     private Long userID;
+    private OffsetDateTime dateOfRatingPlacement;
 }

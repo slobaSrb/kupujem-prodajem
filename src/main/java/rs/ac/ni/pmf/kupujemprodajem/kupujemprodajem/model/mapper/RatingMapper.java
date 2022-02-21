@@ -13,7 +13,7 @@ public class RatingMapper {
                 .ratingComment(ratingEntity.getRatingComment())
                 .adID(ratingEntity.getAd().getAdID())
                 .userID(ratingEntity.getUser().getUserID())
-               // .dateOfRatingPlacement(ratingEntity.getDateOfRating())
+                .dateOfRatingPlacement(ratingEntity.getDateOfRating())
                 .build();
     }
 
@@ -24,7 +24,7 @@ public class RatingMapper {
                 .ratingComment(ratingDto.getRatingComment())
                 .ad(AdEntity.builder().adID(ratingDto.getRatingID()).build())
                 .user(UserEntity.builder().userID(ratingDto.getUserID()).build())
-               // .dateOfRating(ratingDto.getDateOfRatingPlacement())
+                .dateOfRating(ratingDto.getDateOfRatingPlacement())
                 .build();
     }
 }
