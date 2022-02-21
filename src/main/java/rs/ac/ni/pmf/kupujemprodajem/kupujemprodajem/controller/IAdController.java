@@ -15,14 +15,14 @@ import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.CommentDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.PurchaseDTO;
 
 @RequestMapping("/v1")
-@ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Found the ad"),
-        @ApiResponse(responseCode = "201", description = "Ad has been created"),
-        @ApiResponse(responseCode = "202", description = "Ad updated"),
-        @ApiResponse(responseCode = "404", description = "Ad not found"),
-        @ApiResponse(responseCode = "405", description = "Method not allowed"),
-        @ApiResponse(responseCode = "500", description = "Internal server error contact developer")
-})
+//@ApiResponses(value = {
+//        @ApiResponse(responseCode = "200", description = "Found the ad"),
+//        @ApiResponse(responseCode = "201", description = "Ad has been created"),
+//        @ApiResponse(responseCode = "202", description = "Ad updated"),
+//        @ApiResponse(responseCode = "404", description = "Ad not found"),
+//        @ApiResponse(responseCode = "405", description = "Method not allowed"),
+//        @ApiResponse(responseCode = "500", description = "Internal server error contact developer")
+//})
 public interface IAdController {
 
     @GetMapping("/ads")

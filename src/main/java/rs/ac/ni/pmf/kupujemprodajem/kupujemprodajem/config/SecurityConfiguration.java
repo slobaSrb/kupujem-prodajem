@@ -63,8 +63,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
                 .anyRequest()
                 .authenticated()
                 .and()
-                .formLogin()
-                .and()
+                //.formLogin()
+                //.and()
                 .httpBasic()
                 .authenticationEntryPoint((request, response, e) -> {
                     log.error("Authentication error: {}", e.getMessage());

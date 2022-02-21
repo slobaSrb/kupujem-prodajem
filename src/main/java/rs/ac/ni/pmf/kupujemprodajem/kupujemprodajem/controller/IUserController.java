@@ -16,14 +16,14 @@ import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.RatingDTO;
 import rs.ac.ni.pmf.kupujemprodajem.kupujemprodajem.model.dto.UserDTO;
 
 @RequestMapping("/v1")
-@ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Found the resource"),
-        @ApiResponse(responseCode = "201", description = "Resource has been created"),
-        @ApiResponse(responseCode = "202", description = "Resource updated"),
-        @ApiResponse(responseCode = "404", description = "Resource not found"),
-        @ApiResponse(responseCode = "405", description = "Method not allowed"),
-        @ApiResponse(responseCode = "500", description = "Internal server error contact developer")
-})
+//@ApiResponses(value = {
+//        @ApiResponse(responseCode = "200", description = "Found the resource"),
+//        @ApiResponse(responseCode = "201", description = "Resource has been created"),
+//        @ApiResponse(responseCode = "202", description = "Resource updated"),
+//        @ApiResponse(responseCode = "404", description = "Resource not found"),
+//        @ApiResponse(responseCode = "405", description = "Method not allowed"),
+//        @ApiResponse(responseCode = "500", description = "Internal server error contact developer")
+//})
 public interface IUserController {
     @GetMapping("/users")
     @Operation(summary = "Retrieve the list of all users")
